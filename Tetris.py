@@ -1,6 +1,7 @@
 import pygame, sys
 from pygame.locals import *
-from test import *
+from tetris_piece import *
+from random import randint
 
 pygame.init()
 clock = pygame.time.Clock()
@@ -27,20 +28,14 @@ def create_board():
 
 
 def create_piece():
-    return {"start_x": BOARD_WIDTH/2, "start_y": 1, SHAPE_ARR: [[0, 0, 1], [0, 1, 1], [0, 1, 0]]}
+    random_piece = randint(0, len(possible_pieces) - 1)
+    random_rotation = randint(1, len(possible_pieces[random_piece]))
+    return {"start_x": BOARD_WIDTH/2, "start_y": 1, SHAPE_ARR: possible_pieces[random_piece][random_rotation]}
 
 board = create_board()
-start_x = BOARD_WIDTH / 2
-start_y = 1
-current_x = start_x
-current_y = start_y
 
 current_block = create_piece()
 viewerSurface = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
-
-block_row = len(current_block[SHAPE_ARR])
-block_col = len(current_block[SHAPE_ARR][0])
-
 
 def box_to_window_rect(x, y):
     x = BOX_LENGTH * x + BORDER_WIDTH
@@ -56,6 +51,8 @@ def draw_board(board):
 
 
 def draw_piece(tetris_piece):
+    block_row = len(tetris_piece[SHAPE_ARR])
+    block_col = len(tetris_piece[SHAPE_ARR][0])
     for j in xrange(block_row):
         for i in xrange(block_col):
             if tetris_piece[SHAPE_ARR][j][i] == 1:
@@ -63,6 +60,8 @@ def draw_piece(tetris_piece):
 
 
 def draw_block_on_board(tetris_piece, board):
+    block_row = len(tetris_piece[SHAPE_ARR])
+    block_col = len(tetris_piece[SHAPE_ARR][0])
     for j in xrange(block_row):
         for i in xrange(block_col):
             if tetris_piece[SHAPE_ARR][j][i] != 0:
@@ -70,21 +69,25 @@ def draw_block_on_board(tetris_piece, board):
 
 
 def valid_position(tetris_piece, x, y):
+    block_row = len(tetris_piece[SHAPE_ARR])
+    block_col = len(tetris_piece[SHAPE_ARR][0])
     for j in xrange(block_row):
         for i in xrange(block_col):
-            next_x = tetris_piece["start_x"] + i + x
-            next_y = tetris_piece["start_y"] + j + y
-            if next_x < -1 or next_x > BOARD_WIDTH - 1:
-                return False
-            if next_y > BOARD_HEIGHT - 1:
-                return False
-            if board[next_y][next_x] != 0 \
-                    and tetris_piece[SHAPE_ARR][j][i] == 1:
-                return False
+            if tetris_piece[SHAPE_ARR][j][i] == 1:
+                next_x = tetris_piece["start_x"] + i + x
+                next_y = tetris_piece["start_y"] + j + y
+                if next_x < -1 or next_x > BOARD_WIDTH - 1:
+                    return False
+                if next_y > BOARD_HEIGHT - 1:
+                    return False
+                if board[next_y][next_x] != 0:
+                    return False
     return True
 
 
 def check_block_collision(tetris_piece):
+    block_row = len(tetris_piece[SHAPE_ARR])
+    block_col = len(tetris_piece[SHAPE_ARR][0])
     for j in xrange(block_row):
         for i in xrange(block_col):
             if not valid_position(tetris_piece, 0, 1):
@@ -108,15 +111,15 @@ while True:
             if event.key == pygame.K_RIGHT:
                 moving_right = event.type == pygame.KEYDOWN
 
-    if current_y < BOARD_HEIGHT - 1:
+    if current_block["start_y"] < BOARD_HEIGHT - 1:
         if moving_down:
             if valid_position(current_block, 0, 1):
                 current_block["start_y"] += 1
-    if current_x > 0:
+    if current_block["start_x"] > 0:
         if moving_left:
             if valid_position(current_block, -1, 0):
                 current_block["start_x"] -= 1
-    if current_x < BOARD_WIDTH - 1:
+    if current_block["start_x"] < BOARD_WIDTH - 1:
         if moving_right:
             if valid_position(current_block, 1, 0):
                 current_block["start_x"] += 1
