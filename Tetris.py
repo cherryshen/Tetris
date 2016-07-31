@@ -13,8 +13,6 @@ BOARD_WIDTH = 10 # need 10 boxes
 BOARD_HEIGHT = 20 # need 20 boxes
 WINDOW_WIDTH = BOARD_WIDTH * BOX_LENGTH + BORDER_WIDTH * 2
 WINDOW_HEIGHT = BOARD_HEIGHT * BOX_LENGTH + BORDER_HEIGHT * 2
-RED = (255,   0,   0)
-GREEN = (0,   255,   0)
 FALLING_BLOCK_FREQUENCY = 750
 SHAPE_ARR = "shape_array"
 
@@ -31,12 +29,14 @@ def create_board():
 def create_piece():
     random_piece = randint(0, len(possible_pieces) - 1)
     random_rotation = randint(0, len(possible_pieces[random_piece])-1)
+    random_color = randint(0, len(possible_colors)-1)
     return {
         "start_x": BOARD_WIDTH/2,
         "start_y": 1,
         SHAPE_ARR: possible_pieces[random_piece][random_rotation],
         "piece": random_piece,
-        "rotation": random_rotation
+        "rotation": random_rotation,
+        "color": possible_colors[random_color]
     }
 
 def rotate_block(tetris_piece):
@@ -70,7 +70,7 @@ def draw_piece(tetris_piece):
     for j in xrange(block_row):
         for i in xrange(block_col):
             if tetris_piece[SHAPE_ARR][j][i] == 1:
-                viewerSurface.fill(GREEN, box_to_window_rect(tetris_piece["start_x"]+i, tetris_piece["start_y"] + j))
+                viewerSurface.fill(tetris_piece["color"], box_to_window_rect(tetris_piece["start_x"]+i, tetris_piece["start_y"] + j))
 
 def clear_lines():
     for i in xrange(BOARD_HEIGHT):
@@ -89,7 +89,7 @@ def draw_block_on_board(tetris_piece, board):
     for j in xrange(block_row):
         for i in xrange(block_col):
             if tetris_piece[SHAPE_ARR][j][i] != 0:
-                board[tetris_piece["start_y"]+j][tetris_piece["start_x"]+i] = RED
+                board[tetris_piece["start_y"]+j][tetris_piece["start_x"]+i] = tetris_piece["color"]
 
 
 def valid_position(tetris_piece, x, y):
