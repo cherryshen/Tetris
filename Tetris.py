@@ -30,7 +30,10 @@ def create_board():
 def create_piece():
     random_piece = randint(0, len(possible_pieces) - 1)
     random_rotation = randint(1, len(possible_pieces[random_piece]))
-    return {"start_x": BOARD_WIDTH/2, "start_y": 1, SHAPE_ARR: possible_pieces[random_piece][random_rotation]}
+    return {"start_x": BOARD_WIDTH/2, "start_y": 1, SHAPE_ARR: possible_pieces[random_piece][random_rotation], "piece": random_piece}
+
+# def rotate(tetris_piece):
+
 
 board = create_board()
 
@@ -76,7 +79,7 @@ def valid_position(tetris_piece, x, y):
             if tetris_piece[SHAPE_ARR][j][i] == 1:
                 next_x = tetris_piece["start_x"] + i + x
                 next_y = tetris_piece["start_y"] + j + y
-                if next_x < -1 or next_x > BOARD_WIDTH - 1:
+                if next_x < 0 or next_x > BOARD_WIDTH - 1:
                     return False
                 if next_y > BOARD_HEIGHT - 1:
                     return False
@@ -115,7 +118,7 @@ while True:
         if moving_down:
             if valid_position(current_block, 0, 1):
                 current_block["start_y"] += 1
-    if current_block["start_x"] > 0:
+    if current_block["start_x"] >= 0:
         if moving_left:
             if valid_position(current_block, -1, 0):
                 current_block["start_x"] -= 1
