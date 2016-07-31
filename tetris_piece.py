@@ -48,6 +48,7 @@ GREEN = (153, 255, 204)
 YELLOW = (255, 255, 153)
 ORANGE = (255, 204, 153)
 RED = (255, 153, 153)
+WHITE = (255, 255, 255)
 
 possible_pieces = [i_Shape, o_Shape, t_Shape, l_Shape, l2_Shape, s_Shape, s2_Shape]
 possible_colors = [PINK, PURPLE, BLUE, TEAL, GREEN, YELLOW, ORANGE, RED]

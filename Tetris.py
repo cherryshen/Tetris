@@ -15,8 +15,7 @@ WINDOW_WIDTH = BOARD_WIDTH * BOX_LENGTH + BORDER_WIDTH * 2
 WINDOW_HEIGHT = BOARD_HEIGHT * BOX_LENGTH + BORDER_HEIGHT * 2
 FALLING_BLOCK_FREQUENCY = 750
 SHAPE_ARR = "shape_array"
-WHITE = (255, 255, 255)
-font = pygame.font.Font(None, 45)
+game_over_font = pygame.font.Font(None, 45)
 
 moving_left = False
 moving_right = False
@@ -192,12 +191,12 @@ while True:
     draw_board(board)
 
     if game_over:
-        text = font.render("Game Over", True, WHITE)
-        text_rect = text.get_rect()
-        text_x = viewerSurface.get_width() / 2 - text_rect.width / 2
-        text_y = viewerSurface.get_height() / 2 - text_rect.height / 2
-        viewerSurface.blit(text, [text_x, text_y])
+        game_over_text = game_over_font.render("Game Over!", True, WHITE)
+        game_over_rect = game_over_text.get_rect()
+        game_over_x = viewerSurface.get_width() / 2 - game_over_rect.width / 2
+        game_over_y = viewerSurface.get_height() / 2 - game_over_rect.height / 2
+        viewerSurface.blit(game_over_text, [game_over_x, game_over_y])
 
     pygame.display.update()
 
-    clock.tick(6.5)
+    clock.tick(8)
