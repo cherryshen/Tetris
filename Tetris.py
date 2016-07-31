@@ -21,6 +21,7 @@ moving_right = False
 moving_down = False
 rotate = False
 last_falling_block_time = 0
+is_fast_drop = False
 
 def create_board():
     return [[0] * BOARD_WIDTH for _ in xrange(BOARD_HEIGHT)]
@@ -134,7 +135,13 @@ while True:
                 moving_left = event.type == pygame.KEYDOWN
             if event.key == pygame.K_RIGHT:
                 moving_right = event.type == pygame.KEYDOWN
+            if event.key == pygame.K_SPACE:
+                is_fast_drop = event.type == pygame.KEYDOWN
 
+    if is_fast_drop:
+        while valid_position(current_block, 0, 1):
+            current_block["start_y"] += 1
+            last_falling_block_time = pygame.time.get_ticks()
     if current_block["start_y"] < BOARD_HEIGHT - 1:
         if moving_down:
             if valid_position(current_block, 0, 1):
