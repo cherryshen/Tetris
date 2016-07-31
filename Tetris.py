@@ -15,13 +15,14 @@ WINDOW_WIDTH = BOARD_WIDTH * BOX_LENGTH + BORDER_WIDTH * 2
 WINDOW_HEIGHT = BOARD_HEIGHT * BOX_LENGTH + BORDER_HEIGHT * 2
 RED = (255,   0,   0)
 GREEN = (0,   255,   0)
-
+FALLING_BLOCK_FREQUENCY = 750
 SHAPE_ARR = "shape_array"
 
 moving_left = False
 moving_right = False
 moving_down = False
 rotate = False
+last_falling_block_time = 0
 
 def create_board():
     return [[0] * BOARD_WIDTH for _ in xrange(BOARD_HEIGHT)]
@@ -37,7 +38,6 @@ def create_piece():
         "piece": random_piece,
         "rotation": random_rotation
     }
-
 
 def rotate_block(tetris_piece):
     curr_piece = tetris_piece["piece"]
@@ -139,14 +139,23 @@ while True:
         if moving_down:
             if valid_position(current_block, 0, 1):
                 current_block["start_y"] += 1
+                last_falling_block_time = pygame.time.get_ticks()
     if current_block["start_x"] >= 0:
         if moving_left:
             if valid_position(current_block, -1, 0):
                 current_block["start_x"] -= 1
+                last_falling_block_time = pygame.time.get_ticks()
     if current_block["start_x"] < BOARD_WIDTH - 1:
         if moving_right:
             if valid_position(current_block, 1, 0):
                 current_block["start_x"] += 1
+                last_falling_block_time = pygame.time.get_ticks()
+
+    if pygame.time.get_ticks() - last_falling_block_time > FALLING_BLOCK_FREQUENCY:
+        if valid_position(current_block, 0, 1):
+            current_block["start_y"] += 1
+            last_falling_block_time = pygame.time.get_ticks()
+
     if rotate:
         rotated_block = create_piece()
         for entry in current_block:
