@@ -72,6 +72,16 @@ def draw_piece(tetris_piece):
             if tetris_piece[SHAPE_ARR][j][i] == 1:
                 viewerSurface.fill(GREEN, box_to_window_rect(tetris_piece["start_x"]+i, tetris_piece["start_y"] + j))
 
+def clear_lines():
+    for i in xrange(BOARD_HEIGHT):
+        need_to_clear = True
+        for j in xrange(BOARD_WIDTH):
+            if board[i][j] == 0:
+                need_to_clear = False
+        if need_to_clear:
+            del board[i]
+            new_array = [0 for _ in xrange(BOARD_WIDTH)]
+            board.insert(0, new_array)
 
 def draw_block_on_board(tetris_piece, board):
     block_row = len(tetris_piece[SHAPE_ARR])
@@ -151,6 +161,7 @@ while True:
 
     viewerSurface.fill((0, 0, 0))
     draw_piece(current_block)
+    clear_lines()
     draw_board(board)
 
     pygame.display.update()
