@@ -15,6 +15,8 @@ WINDOW_WIDTH = BOARD_WIDTH * BOX_LENGTH + BORDER_WIDTH * 2
 WINDOW_HEIGHT = BOARD_HEIGHT * BOX_LENGTH + BORDER_HEIGHT * 2
 FALLING_BLOCK_FREQUENCY = 750
 SHAPE_ARR = "shape_array"
+WHITE = (255, 255, 255)
+font = pygame.font.Font(None, 45)
 
 moving_left = False
 moving_right = False
@@ -22,6 +24,7 @@ moving_down = False
 rotate = False
 last_falling_block_time = 0
 is_fast_drop = False
+game_over = False
 
 def create_board():
     return [[0] * BOARD_WIDTH for _ in xrange(BOARD_HEIGHT)]
@@ -142,16 +145,19 @@ while True:
         while valid_position(current_block, 0, 1):
             current_block["start_y"] += 1
             last_falling_block_time = pygame.time.get_ticks()
+
     if current_block["start_y"] < BOARD_HEIGHT - 1:
         if moving_down:
             if valid_position(current_block, 0, 1):
                 current_block["start_y"] += 1
                 last_falling_block_time = pygame.time.get_ticks()
+
     if current_block["start_x"] >= 0:
         if moving_left:
             if valid_position(current_block, -1, 0):
                 current_block["start_x"] -= 1
                 last_falling_block_time = pygame.time.get_ticks()
+
     if current_block["start_x"] < BOARD_WIDTH - 1:
         if moving_right:
             if valid_position(current_block, 1, 0):
@@ -172,14 +178,26 @@ while True:
             current_block = rotated_block
 
     if check_block_collision(current_block):
-        draw_block_on_board(current_block, board)
-        current_block = create_piece()
+        if not valid_position(current_block, 0, 0):
+            game_over = True
+        else:
+            draw_block_on_board(current_block, board)
+            current_block = create_piece()
 
     viewerSurface.fill((0, 0, 0))
-    draw_piece(current_block)
+
+    if valid_position(current_block, 0, 0):
+        draw_piece(current_block)
     clear_lines()
     draw_board(board)
 
+    if game_over:
+        text = font.render("Game Over", True, WHITE)
+        text_rect = text.get_rect()
+        text_x = viewerSurface.get_width() / 2 - text_rect.width / 2
+        text_y = viewerSurface.get_height() / 2 - text_rect.height / 2
+        viewerSurface.blit(text, [text_x, text_y])
+
     pygame.display.update()
 
-    clock.tick(9)
+    clock.tick(6.5)
