@@ -21,7 +21,7 @@ SHAPE_ARR = "shape_array"
 moving_left = False
 moving_right = False
 moving_down = False
-# moving_up = False
+rotate = False
 
 def create_board():
     return [[0] * BOARD_WIDTH for _ in xrange(BOARD_HEIGHT)]
@@ -29,10 +29,22 @@ def create_board():
 
 def create_piece():
     random_piece = randint(0, len(possible_pieces) - 1)
-    random_rotation = randint(1, len(possible_pieces[random_piece]))
-    return {"start_x": BOARD_WIDTH/2, "start_y": 1, SHAPE_ARR: possible_pieces[random_piece][random_rotation], "piece": random_piece}
+    random_rotation = randint(0, len(possible_pieces[random_piece])-1)
+    return {
+        "start_x": BOARD_WIDTH/2,
+        "start_y": 1,
+        SHAPE_ARR: possible_pieces[random_piece][random_rotation],
+        "piece": random_piece,
+        "rotation": random_rotation
+    }
 
-# def rotate(tetris_piece):
+
+def rotate_block(tetris_piece):
+    curr_piece = tetris_piece["piece"]
+    total_rotations = len(possible_pieces[curr_piece])
+    new_rotation = (tetris_piece["rotation"] + 1) % total_rotations
+    tetris_piece[SHAPE_ARR] = possible_pieces[curr_piece][new_rotation]
+    tetris_piece["rotation"] = new_rotation
 
 
 board = create_board()
@@ -51,7 +63,6 @@ def draw_board(board):
         for j in xrange(BOARD_WIDTH):
             if board[i][j] != 0:
                 viewerSurface.fill(board[i][j], box_to_window_rect(j, i))
-
 
 def draw_piece(tetris_piece):
     block_row = len(tetris_piece[SHAPE_ARR])
@@ -107,8 +118,8 @@ while True:
         if event.type == pygame.KEYDOWN or event.type == pygame.KEYUP:
             if event.key == pygame.K_DOWN:
                 moving_down = event.type == pygame.KEYDOWN
-            # if event.key == pygame.K_UP:
-            #     moving_up = event.type == pygame.KEYDOWN
+            if event.key == pygame.K_UP:
+                rotate = event.type == pygame.KEYDOWN
             if event.key == pygame.K_LEFT:
                 moving_left = event.type == pygame.KEYDOWN
             if event.key == pygame.K_RIGHT:
@@ -126,10 +137,13 @@ while True:
         if moving_right:
             if valid_position(current_block, 1, 0):
                 current_block["start_x"] += 1
-    # if current_y > 0:
-    #     if moving_up:
-    #         if valid_position(current_block, 0, -1):
-    #             current_block["start_y"] -= 1
+    if rotate:
+        rotated_block = create_piece()
+        for entry in current_block:
+            rotated_block[entry] = current_block[entry]
+        rotate_block(rotated_block)
+        if valid_position(rotated_block, 0, 0):
+            current_block = rotated_block
 
     if check_block_collision(current_block):
         draw_block_on_board(current_block, board)
@@ -141,4 +155,4 @@ while True:
 
     pygame.display.update()
 
-    clock.tick(10)
+    clock.tick(9)
