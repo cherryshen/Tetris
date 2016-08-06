@@ -62,7 +62,7 @@ board = create_board()
 
 current_block = create_piece()
 viewerSurface = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
-
+pygame.display.set_caption("Tetris Remastered")
 
 def box_to_window_rect(x, y):
     x = BOX_LENGTH * x + BORDER_WIDTH
