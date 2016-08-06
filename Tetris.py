@@ -53,16 +53,16 @@ def rotate_block(tetris_piece):
     tetris_piece[SHAPE_ARR] = possible_pieces[curr_piece][new_rotation]
     tetris_piece["rotation"] = new_rotation
 
-# def level_and_score():
-#     score = cleared_lines
-#     level = 1 + cleared_lines % 10
-#     return score, level
+def level_and_score():
+    score = cleared_lines
+    level = cleared_lines % 10
+    return score, level
 
 board = create_board()
 
 current_block = create_piece()
 viewerSurface = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
-pygame.display.set_caption("Tetris Remastered")
+pygame.display.set_caption("Tetris Remix")
 
 def box_to_window_rect(x, y):
     x = BOX_LENGTH * x + BORDER_WIDTH
@@ -75,6 +75,7 @@ def draw_board(board):
         for j in xrange(BOARD_WIDTH):
             if board[i][j] != 0:
                 viewerSurface.fill(board[i][j], box_to_window_rect(j, i))
+                pygame.draw.rect(viewerSurface, WHITE, Rect(box_to_window_rect(j, i)), 1)
 
 
 def draw_piece(tetris_piece):
@@ -84,16 +85,18 @@ def draw_piece(tetris_piece):
         for i in xrange(block_col):
             if tetris_piece[SHAPE_ARR][j][i] == 1:
                 viewerSurface.fill(tetris_piece["color"], box_to_window_rect(tetris_piece["start_x"]+i, tetris_piece["start_y"] + j))
+                pygame.draw.rect(viewerSurface, WHITE, Rect(box_to_window_rect(tetris_piece["start_x"]+i, tetris_piece["start_y"] + j)), 1)
 
 
 def clear_lines():
+    global cleared_lines
     for i in xrange(BOARD_HEIGHT):
         need_to_clear = True
         for j in xrange(BOARD_WIDTH):
             if board[i][j] == 0:
                 need_to_clear = False
         if need_to_clear:
-            # cleared_lines += 1
+            cleared_lines += 1
             del board[i]
             new_array = [0 for _ in xrange(BOARD_WIDTH)]
             board.insert(0, new_array)
@@ -133,7 +136,6 @@ def check_block_collision(tetris_piece):
             if not valid_position(tetris_piece, 0, 1):
                 return True
     return False
-
 
 while True:
     for event in pygame.event.get():
