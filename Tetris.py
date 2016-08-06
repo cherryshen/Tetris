@@ -24,6 +24,9 @@ rotate = False
 last_falling_block_time = 0
 is_fast_drop = False
 game_over = False
+score = 0
+level = 1
+cleared_lines = 0
 
 def create_board():
     return [[0] * BOARD_WIDTH for _ in xrange(BOARD_HEIGHT)]
@@ -42,6 +45,7 @@ def create_piece():
         "color": possible_colors[random_color]
     }
 
+
 def rotate_block(tetris_piece):
     curr_piece = tetris_piece["piece"]
     total_rotations = len(possible_pieces[curr_piece])
@@ -49,11 +53,16 @@ def rotate_block(tetris_piece):
     tetris_piece[SHAPE_ARR] = possible_pieces[curr_piece][new_rotation]
     tetris_piece["rotation"] = new_rotation
 
+# def level_and_score():
+#     score = cleared_lines
+#     level = 1 + cleared_lines % 10
+#     return score, level
 
 board = create_board()
 
 current_block = create_piece()
 viewerSurface = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
+
 
 def box_to_window_rect(x, y):
     x = BOX_LENGTH * x + BORDER_WIDTH
@@ -67,6 +76,7 @@ def draw_board(board):
             if board[i][j] != 0:
                 viewerSurface.fill(board[i][j], box_to_window_rect(j, i))
 
+
 def draw_piece(tetris_piece):
     block_row = len(tetris_piece[SHAPE_ARR])
     block_col = len(tetris_piece[SHAPE_ARR][0])
@@ -75,6 +85,7 @@ def draw_piece(tetris_piece):
             if tetris_piece[SHAPE_ARR][j][i] == 1:
                 viewerSurface.fill(tetris_piece["color"], box_to_window_rect(tetris_piece["start_x"]+i, tetris_piece["start_y"] + j))
 
+
 def clear_lines():
     for i in xrange(BOARD_HEIGHT):
         need_to_clear = True
@@ -82,9 +93,11 @@ def clear_lines():
             if board[i][j] == 0:
                 need_to_clear = False
         if need_to_clear:
+            # cleared_lines += 1
             del board[i]
             new_array = [0 for _ in xrange(BOARD_WIDTH)]
             board.insert(0, new_array)
+
 
 def draw_block_on_board(tetris_piece, board):
     block_row = len(tetris_piece[SHAPE_ARR])
@@ -181,6 +194,7 @@ while True:
             game_over = True
         else:
             draw_block_on_board(current_block, board)
+            is_fast_drop = False
             current_block = create_piece()
 
     viewerSurface.fill((0, 0, 0))
