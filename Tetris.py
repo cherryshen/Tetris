@@ -1,8 +1,7 @@
 import pygame, sys
 from pygame.locals import *
-from tetris_piece import *
 from constants import *
-from random import randint
+from Piece import *
 
 pygame.init()
 clock = pygame.time.Clock()
@@ -20,32 +19,16 @@ score = 0
 level = 1
 cleared_lines = 0
 game_paused = False
-i=0
 
 def create_board():
     return [[0] * BOARD_WIDTH for _ in xrange(BOARD_HEIGHT)]
 
-
-def create_piece():
-    random_piece = randint(0, len(possible_pieces) - 1)
-    random_rotation = randint(0, len(possible_pieces[random_piece])-1)
-    random_color = randint(0, len(possible_colors)-1)
-    return {
-        PIECE_START_X: BOARD_WIDTH/2,
-        PIECE_START_Y: 1,
-        SHAPE_ARR: possible_pieces[random_piece][random_rotation],
-        PIECE: random_piece,
-        PIECE_ROTATION: random_rotation,
-        PIECE_COLOR: possible_colors[random_color]
-    }
-
-
 def rotate_block(tetris_piece):
-    curr_piece = tetris_piece[PIECE]
+    curr_piece = tetris_piece.piece
     total_rotations = len(possible_pieces[curr_piece])
-    new_rotation = (tetris_piece[PIECE_ROTATION] + 1) % total_rotations
-    tetris_piece[SHAPE_ARR] = possible_pieces[curr_piece][new_rotation]
-    tetris_piece[PIECE_ROTATION] = new_rotation
+    new_rotation = (tetris_piece.rotation + 1) % total_rotations
+    tetris_piece.shapeArr = possible_pieces[curr_piece][new_rotation]
+    tetris_piece.rotation = new_rotation
 
 def level_and_score():
     global cleared_lines
@@ -55,7 +38,7 @@ def level_and_score():
 
 board = create_board()
 
-current_block = create_piece()
+current_block = Piece(BOARD_WIDTH, 1)
 viewerSurface = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
 pygame.display.set_caption(TITLE)
 game_window_width = viewerSurface.get_width() / 2
@@ -76,13 +59,13 @@ def draw_board(board):
 
 
 def draw_piece(tetris_piece):
-    block_row = len(tetris_piece[SHAPE_ARR])
-    block_col = len(tetris_piece[SHAPE_ARR][0])
+    block_row = len(tetris_piece.shapeArr)
+    block_col = len(tetris_piece.shapeArr[0])
     for j in xrange(block_row):
         for i in xrange(block_col):
-            if tetris_piece[SHAPE_ARR][j][i] == 1:
-                viewerSurface.fill(tetris_piece[PIECE_COLOR], box_to_window_rect(tetris_piece[PIECE_START_X]+i, tetris_piece[PIECE_START_Y] + j))
-                pygame.draw.rect(viewerSurface, WHITE, Rect(box_to_window_rect(tetris_piece[PIECE_START_X]+i, tetris_piece[PIECE_START_Y] + j)), 1)
+            if tetris_piece.shapeArr[j][i] == 1:
+                viewerSurface.fill(tetris_piece.color, box_to_window_rect(tetris_piece.x+i, tetris_piece.y + j))
+                pygame.draw.rect(viewerSurface, WHITE, Rect(box_to_window_rect(tetris_piece.x+i, tetris_piece.y + j)), 1)
 
 
 def clear_lines():
@@ -100,22 +83,22 @@ def clear_lines():
 
 
 def draw_block_on_board(tetris_piece, board):
-    block_row = len(tetris_piece[SHAPE_ARR])
-    block_col = len(tetris_piece[SHAPE_ARR][0])
+    block_row = len(tetris_piece.shapeArr)
+    block_col = len(tetris_piece.shapeArr[0])
     for j in xrange(block_row):
         for i in xrange(block_col):
-            if tetris_piece[SHAPE_ARR][j][i] != 0:
-                board[tetris_piece[PIECE_START_Y]+j][tetris_piece[PIECE_START_X]+i] = tetris_piece[PIECE_COLOR]
+            if tetris_piece.shapeArr[j][i] != 0:
+                board[tetris_piece.y+j][tetris_piece.x+i] = tetris_piece.color
 
 
 def valid_position(tetris_piece, x, y):
-    block_row = len(tetris_piece[SHAPE_ARR])
-    block_col = len(tetris_piece[SHAPE_ARR][0])
+    block_row = len(tetris_piece.shapeArr)
+    block_col = len(tetris_piece.shapeArr[0])
     for j in xrange(block_row):
         for i in xrange(block_col):
-            if tetris_piece[SHAPE_ARR][j][i] == 1:
-                next_x = tetris_piece[PIECE_START_X] + i + x
-                next_y = tetris_piece[PIECE_START_Y] + j + y
+            if tetris_piece.shapeArr[j][i] == 1:
+                next_x = tetris_piece.x + i + x
+                next_y = tetris_piece.y + j + y
                 if next_x < 0 or next_x > BOARD_WIDTH - 1:
                     return False
                 if next_y > BOARD_HEIGHT - 1:
@@ -126,8 +109,8 @@ def valid_position(tetris_piece, x, y):
 
 
 def check_block_collision(tetris_piece):
-    block_row = len(tetris_piece[SHAPE_ARR])
-    block_col = len(tetris_piece[SHAPE_ARR][0])
+    block_row = len(tetris_piece.shapeArr)
+    block_col = len(tetris_piece.shapeArr[0])
     for j in xrange(block_row):
         for i in xrange(block_col):
             if not valid_position(tetris_piece, 0, 1):
@@ -160,36 +143,34 @@ while True:
     if not game_paused:
         if is_fast_drop:
             while valid_position(current_block, 0, 1):
-                current_block[PIECE_START_Y] += 1
+                current_block.y += 1
                 last_falling_block_time = pygame.time.get_ticks()
 
-        if current_block[PIECE_START_Y] < BOARD_HEIGHT - 1:
+        if current_block.y < BOARD_HEIGHT - 1:
             if moving_down:
                 if valid_position(current_block, 0, 1):
-                    current_block[PIECE_START_Y] += 1
+                    current_block.y += 1
                     last_falling_block_time = pygame.time.get_ticks()
 
-        if current_block[PIECE_START_X] >= 0:
+        if current_block.x >= 0:
             if moving_left:
                 if valid_position(current_block, -1, 0):
-                    current_block[PIECE_START_X] -= 1
+                    current_block.x -= 1
                     last_falling_block_time = pygame.time.get_ticks()
 
-        if current_block[PIECE_START_X] < BOARD_WIDTH - 1:
+        if current_block.x < BOARD_WIDTH - 1:
             if moving_right:
                 if valid_position(current_block, 1, 0):
-                    current_block[PIECE_START_X] += 1
+                    current_block.x += 1
                     last_falling_block_time = pygame.time.get_ticks()
 
         if pygame.time.get_ticks() - last_falling_block_time > FALLING_BLOCK_FREQUENCY:
             if valid_position(current_block, 0, 1):
-                current_block[PIECE_START_Y] += 1
+                current_block.y += 1
                 last_falling_block_time = pygame.time.get_ticks()
 
         if rotate:
-            rotated_block = create_piece()
-            for entry in current_block:
-                rotated_block[entry] = current_block[entry]
+            rotated_block = current_block.copy(BOARD_WIDTH/2, 1)
             rotate_block(rotated_block)
             if valid_position(rotated_block, 0, 0):
                 current_block = rotated_block
@@ -200,7 +181,7 @@ while True:
             else:
                 draw_block_on_board(current_block, board)
                 is_fast_drop = False
-                current_block = create_piece()
+                current_block = Piece(BOARD_WIDTH, 1)
 
     viewerSurface.fill((0, 0, 0))
 
@@ -215,7 +196,7 @@ while True:
                                         pause_text.get_rect().height / 2])
 
     if game_over:
-        game_over_text = game_font.render(TEXT_GAME_OVER, True, WHITE)
+        game_over_text = game_font.render(TEXT_GAME_OVER, True, BLACK)
         game_over_rect = game_over_text.get_rect()
         game_over_x = game_window_width - game_over_rect.width / 2
         game_over_y = game_window_height - game_over_rect.height / 2
