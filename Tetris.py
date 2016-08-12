@@ -174,6 +174,7 @@ while True:
             rotate_block(rotated_block)
             if valid_position(rotated_block, 0, 0):
                 current_block = rotated_block
+                rotate = False
 
         if check_block_collision(current_block):
             if not valid_position(current_block, 0, 0):
