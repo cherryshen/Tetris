@@ -2,6 +2,7 @@ import pygame, sys
 from pygame.locals import *
 from constants import *
 from Piece import *
+import os
 
 pygame.init()
 clock = pygame.time.Clock()
@@ -37,6 +38,13 @@ def level_and_score():
     return score, level
 
 board = create_board()
+
+pygame.mixer.pre_init(44100, 16, 2, 4096)
+dir_path = os.path.dirname(os.path.realpath(__file__))
+music_filepath = dir_path + '/tetrisb.mid'
+pygame.mixer.init()
+pygame.mixer.music.load(music_filepath)
+pygame.mixer.music.play(-1, 0.0)
 
 current_block = Piece(BOARD_WIDTH, 1)
 viewerSurface = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
@@ -202,6 +210,8 @@ while True:
         game_over_x = game_window_width - game_over_rect.width / 2
         game_over_y = game_window_height - game_over_rect.height / 2
         viewerSurface.blit(game_over_text, [game_over_x, game_over_y])
+        pygame.mixer.music.stop()
+
 
     pygame.display.update()
 
