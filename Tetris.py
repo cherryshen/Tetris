@@ -110,13 +110,11 @@ while True:
             if moving_left:
                 if board.valid_position(current_block, -1, 0):
                     current_block.x -= 1
-                    last_falling_block_time = pygame.time.get_ticks()
 
         if current_block.x < BOARD_WIDTH - 1:
             if moving_right:
                 if board.valid_position(current_block, 1, 0):
                     current_block.x += 1
-                    last_falling_block_time = pygame.time.get_ticks()
 
         if pygame.time.get_ticks() - last_falling_block_time > FALLING_BLOCK_FREQUENCY:
             if board.valid_position(current_block, 0, 1):
