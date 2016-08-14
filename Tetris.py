@@ -1,8 +1,8 @@
-import pygame, sys
+import pygame, sys, os
 from pygame.locals import *
-from constants import *
+from Board import *
 from Piece import *
-import os
+
 
 pygame.init()
 clock = pygame.time.Clock()
@@ -21,8 +21,6 @@ level = 1
 cleared_lines = 0
 game_paused = False
 
-def create_board():
-    return [[0] * BOARD_WIDTH for _ in xrange(BOARD_HEIGHT)]
 
 def rotate_block(tetris_piece):
     curr_piece = tetris_piece.piece
@@ -37,12 +35,10 @@ def level_and_score():
     level = cleared_lines % 10
     return score, level
 
-board = create_board()
+board = Board(BOARD_WIDTH, BOARD_HEIGHT)
 
-pygame.mixer.pre_init(44100, 16, 2, 4096)
 dir_path = os.path.dirname(os.path.realpath(__file__))
-music_filepath = dir_path + '/tetrisb.mid'
-pygame.mixer.init()
+music_filepath = dir_path + '/tetris_music.mid'
 pygame.mixer.music.load(music_filepath)
 pygame.mixer.music.play(-1, 0.0)
 
@@ -51,6 +47,7 @@ viewerSurface = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
 pygame.display.set_caption(TITLE)
 game_window_width = viewerSurface.get_width() / 2
 game_window_height = viewerSurface.get_height() / 2
+
 
 def box_to_window_rect(x, y):
     x = BOX_LENGTH * x + BORDER_WIDTH
@@ -61,8 +58,8 @@ def box_to_window_rect(x, y):
 def draw_board(board):
     for i in xrange(BOARD_HEIGHT):
         for j in xrange(BOARD_WIDTH):
-            if board[i][j] != 0:
-                viewerSurface.fill(board[i][j], box_to_window_rect(j, i))
+            if board.board[i][j] != 0:
+                viewerSurface.fill(board.board[i][j], box_to_window_rect(j, i))
                 pygame.draw.rect(viewerSurface, WHITE, Rect(box_to_window_rect(j, i)), 1)
 
 
@@ -75,58 +72,7 @@ def draw_piece(tetris_piece):
                 viewerSurface.fill(tetris_piece.color, box_to_window_rect(tetris_piece.x+i, tetris_piece.y + j))
                 pygame.draw.rect(viewerSurface, WHITE, Rect(box_to_window_rect(tetris_piece.x+i, tetris_piece.y + j)), 1)
 
-
-def clear_lines():
-    global cleared_lines
-    for i in xrange(BOARD_HEIGHT):
-        need_to_clear = True
-        for j in xrange(BOARD_WIDTH):
-            if board[i][j] == 0:
-                need_to_clear = False
-        if need_to_clear:
-            cleared_lines += 1
-            del board[i]
-            new_array = [0 for _ in xrange(BOARD_WIDTH)]
-            board.insert(0, new_array)
-
-
-def draw_block_on_board(tetris_piece, board):
-    block_row = len(tetris_piece.shapeArr)
-    block_col = len(tetris_piece.shapeArr[0])
-    for j in xrange(block_row):
-        for i in xrange(block_col):
-            if tetris_piece.shapeArr[j][i] != 0:
-                board[tetris_piece.y+j][tetris_piece.x+i] = tetris_piece.color
-
-
-def valid_position(tetris_piece, x, y):
-    block_row = len(tetris_piece.shapeArr)
-    block_col = len(tetris_piece.shapeArr[0])
-    for j in xrange(block_row):
-        for i in xrange(block_col):
-            if tetris_piece.shapeArr[j][i] == 1:
-                next_x = tetris_piece.x + i + x
-                next_y = tetris_piece.y + j + y
-                if next_x < 0 or next_x > BOARD_WIDTH - 1:
-                    return False
-                if next_y > BOARD_HEIGHT - 1:
-                    return False
-                if board[next_y][next_x] != 0:
-                    return False
-    return True
-
-
-def check_block_collision(tetris_piece):
-    block_row = len(tetris_piece.shapeArr)
-    block_col = len(tetris_piece.shapeArr[0])
-    for j in xrange(block_row):
-        for i in xrange(block_col):
-            if not valid_position(tetris_piece, 0, 1):
-                return True
-    return False
-
 pause_text = game_font.render(TEXT_GAME_PAUSED, True, BLACK)
-
 
 while True:
     for event in pygame.event.get():
@@ -150,53 +96,53 @@ while True:
 
     if not game_paused:
         if is_fast_drop:
-            while valid_position(current_block, 0, 1):
+            while board.valid_position(current_block, 0, 1):
                 current_block.y += 1
                 last_falling_block_time = pygame.time.get_ticks()
 
         if current_block.y < BOARD_HEIGHT - 1:
             if moving_down:
-                if valid_position(current_block, 0, 1):
+                if board.valid_position(current_block, 0, 1):
                     current_block.y += 1
                     last_falling_block_time = pygame.time.get_ticks()
 
         if current_block.x >= 0:
             if moving_left:
-                if valid_position(current_block, -1, 0):
+                if board.valid_position(current_block, -1, 0):
                     current_block.x -= 1
                     last_falling_block_time = pygame.time.get_ticks()
 
         if current_block.x < BOARD_WIDTH - 1:
             if moving_right:
-                if valid_position(current_block, 1, 0):
+                if board.valid_position(current_block, 1, 0):
                     current_block.x += 1
                     last_falling_block_time = pygame.time.get_ticks()
 
         if pygame.time.get_ticks() - last_falling_block_time > FALLING_BLOCK_FREQUENCY:
-            if valid_position(current_block, 0, 1):
+            if board.valid_position(current_block, 0, 1):
                 current_block.y += 1
                 last_falling_block_time = pygame.time.get_ticks()
 
         if rotate:
             rotated_block = current_block.copy(BOARD_WIDTH/2, 1)
             rotate_block(rotated_block)
-            if valid_position(rotated_block, 0, 0):
+            if board.valid_position(rotated_block, 0, 0):
                 current_block = rotated_block
                 rotate = False
 
-        if check_block_collision(current_block):
-            if not valid_position(current_block, 0, 0):
+        if board.check_block_collision(current_block):
+            if not board.valid_position(current_block, 0, 0):
                 game_over = True
             else:
-                draw_block_on_board(current_block, board)
+                board.draw_block_on_board(current_block)
                 is_fast_drop = False
                 current_block = Piece(BOARD_WIDTH, 1)
 
     viewerSurface.fill((0, 0, 0))
 
-    if valid_position(current_block, 0, 0):
+    if board.valid_position(current_block, 0, 0):
         draw_piece(current_block)
-    clear_lines()
+        board.clear_lines()
     draw_board(board)
 
     if game_paused:
@@ -205,13 +151,11 @@ while True:
                                         pause_text.get_rect().height / 2])
 
     if game_over:
-        game_over_text = game_font.render(TEXT_GAME_OVER, True, BLACK)
+        game_over_text = game_font.render(TEXT_GAME_OVER, True, WHITE)
         game_over_rect = game_over_text.get_rect()
         game_over_x = game_window_width - game_over_rect.width / 2
         game_over_y = game_window_height - game_over_rect.height / 2
         viewerSurface.blit(game_over_text, [game_over_x, game_over_y])
-        pygame.mixer.music.stop()
-
 
     pygame.display.update()
 
