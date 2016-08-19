@@ -1,6 +1,7 @@
 from tetris_piece import *
 from random import randint
 
+
 class Piece:
     def __init__(self, start_x, start_y):
         random_piece = randint(0, len(possible_pieces) - 1)
@@ -23,3 +24,9 @@ class Piece:
         newPiece.color = self.color
         return newPiece
 
+    def rotate_block(self):
+        curr_piece = self.piece
+        total_rotations = len(possible_pieces[curr_piece])
+        new_rotation = (self.rotation + 1) % total_rotations
+        self.shapeArr = possible_pieces[curr_piece][new_rotation]
+        self.rotation = new_rotation

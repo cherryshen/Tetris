@@ -22,13 +22,6 @@ cleared_lines = 0
 game_paused = False
 
 
-def rotate_block(tetris_piece):
-    curr_piece = tetris_piece.piece
-    total_rotations = len(possible_pieces[curr_piece])
-    new_rotation = (tetris_piece.rotation + 1) % total_rotations
-    tetris_piece.shapeArr = possible_pieces[curr_piece][new_rotation]
-    tetris_piece.rotation = new_rotation
-
 def level_and_score():
     global cleared_lines
     score = cleared_lines
@@ -123,7 +116,7 @@ while True:
 
         if rotate:
             rotated_block = current_block.copy(BOARD_WIDTH/2, 1)
-            rotate_block(rotated_block)
+            rotated_block.rotate_block()
             if board.valid_position(rotated_block, 0, 0):
                 current_block = rotated_block
                 rotate = False
