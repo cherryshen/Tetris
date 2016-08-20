@@ -22,11 +22,11 @@ cleared_lines = 0
 game_paused = False
 
 
-def level_and_score():
-    global cleared_lines
-    score = cleared_lines
-    level = cleared_lines % 10
-    return score, level
+# def level_and_score():
+#     global cleared_lines
+#     score = cleared_lines
+#     level = cleared_lines % 10
+#     return score, level
 
 board = Board(BOARD_WIDTH, BOARD_HEIGHT)
 
