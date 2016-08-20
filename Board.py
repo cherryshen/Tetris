@@ -3,6 +3,8 @@ from constants import *
 class Board:
     def __init__(self, board_width, board_height):
         self.board = [[0] * board_width for _ in xrange(board_height)]
+        self.score = 0
+        self.level = 1
 
     def clear_lines(self):
         for i in xrange(BOARD_HEIGHT):
@@ -11,6 +13,7 @@ class Board:
                 if self.board[i][j] == 0:
                     need_to_clear = False
             if need_to_clear:
+                self.score += 1
                 del self.board[i]
                 new_array = [0 for _ in xrange(BOARD_WIDTH)]
                 self.board.insert(0, new_array)
@@ -47,5 +50,8 @@ class Board:
                 if not self.valid_position(tetris_piece, 0, 1):
                     return True
         return False
+
+    def level_and_score(self):
+        self.level = self.score % 10
 
 
