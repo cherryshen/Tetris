@@ -4,7 +4,7 @@ class Board:
     def __init__(self, board_width, board_height):
         self.board = [[0] * board_width for _ in xrange(board_height)]
         self.score = 0
-        self.level = 1
+        self.level = 0
 
     def clear_lines(self):
         for i in xrange(BOARD_HEIGHT):
@@ -51,7 +51,9 @@ class Board:
                     return True
         return False
 
-    def level_and_score(self):
-        self.level = self.score % 10
+    def update_level(self):
+        checkLevel = self.score / 10
+        self.level = checkLevel + 1
+
 
 

@@ -3,12 +3,10 @@ from pygame.locals import *
 from Board import *
 from Piece import *
 
-
 pygame.init()
+
 clock = pygame.time.Clock()
-
 game_font = pygame.font.Font(None, 45)
-
 moving_left = False
 moving_right = False
 moving_down = False
@@ -18,7 +16,6 @@ is_fast_drop = False
 game_over = False
 cleared_lines = 0
 game_paused = False
-
 board = Board(BOARD_WIDTH, BOARD_HEIGHT)
 
 dir_path = os.path.dirname(os.path.realpath(__file__))
@@ -29,8 +26,8 @@ pygame.mixer.music.play(-1, 0.0)
 current_block = Piece(BOARD_WIDTH, 1)
 viewerSurface = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
 pygame.display.set_caption(TITLE)
-game_window_width = viewerSurface.get_width() / 2
-game_window_height = viewerSurface.get_height() / 2
+game_window_width = viewerSurface.get_width()
+game_window_height = viewerSurface.get_height()
 
 
 def box_to_window_rect(x, y):
@@ -122,9 +119,16 @@ while True:
 
     viewerSurface.fill((0, 0, 0))
 
+    # pygame.draw.rect(viewerSurface, GREEN, Rect(1, 2, BOARD_WIDTH, BOARD_HEIGHT), 1)
+
+    board.update_level()
+    viewerSurface.blit(game_font.render("Score: "+str(board.score), True, BLUE), [game_window_width/2 + 50,
+                                                                                   game_window_height/2.5])
+
     if board.valid_position(current_block, 0, 0):
         draw_piece(current_block)
         board.clear_lines()
+
     draw_board(board)
 
     if game_paused:
@@ -135,8 +139,8 @@ while True:
     if game_over:
         game_over_text = game_font.render(TEXT_GAME_OVER, True, WHITE)
         game_over_rect = game_over_text.get_rect()
-        game_over_x = game_window_width - game_over_rect.width / 2
-        game_over_y = game_window_height - game_over_rect.height / 2
+        game_over_x = game_window_width/2 - game_over_rect.width / 2
+        game_over_y = game_window_height/2 - game_over_rect.height / 2
         viewerSurface.blit(game_over_text, [game_over_x, game_over_y])
 
     pygame.display.update()
