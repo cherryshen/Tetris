@@ -124,6 +124,8 @@ while True:
     board.update_level()
     viewerSurface.blit(game_font.render("Score: "+str(board.score), True, BLUE), [game_window_width/2 + 50,
                                                                                    game_window_height/2.5])
+    viewerSurface.blit(game_font.render("Level: " + str(board.level), True, TEAL), [game_window_width / 2 + 50,
+                                                                                    game_window_height / 2])
 
     if board.valid_position(current_block, 0, 0):
         draw_piece(current_block)
