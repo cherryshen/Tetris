@@ -119,11 +119,12 @@ while True:
 
     viewerSurface.fill((0, 0, 0))
 
-    # pygame.draw.rect(viewerSurface, GREEN, Rect(1, 2, BOARD_WIDTH, BOARD_HEIGHT), 1)
+    pygame.draw.rect(viewerSurface, GREEN, Rect(1, 2, BOARD_WIDTH*BOX_LENGTH + BORDER_WIDTH, \
+                                                BOARD_HEIGHT*BOX_LENGTH + BORDER_WIDTH), BORDER_WIDTH)
 
     board.update_level()
     viewerSurface.blit(game_font.render("Score: "+str(board.score), True, BLUE), [game_window_width/2 + 50,
-                                                                                   game_window_height/2.5])
+                                                                                  game_window_height/2.5])
     viewerSurface.blit(game_font.render("Level: " + str(board.level), True, TEAL), [game_window_width / 2 + 50,
                                                                                     game_window_height / 2])
 
