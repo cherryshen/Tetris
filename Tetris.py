@@ -75,7 +75,7 @@ while True:
             if event.key == pygame.K_p and event.type == pygame.KEYDOWN:
                 game_paused = not game_paused
 
-    if not game_paused:
+    if not game_paused and not game_over:
         if is_fast_drop:
             while board.valid_position(current_block, 0, 1):
                 current_block.y += 1
@@ -100,9 +100,8 @@ while True:
 
         if not board.valid_position(current_block, 0, 0):
             game_over = True
-
-        if (is_fast_drop or moving_down or
-            (pygame.time.get_ticks() - last_falling_block_time > FALLING_BLOCK_FREQUENCY)):
+        elif (is_fast_drop or moving_down or
+              (pygame.time.get_ticks() - last_falling_block_time > FALLING_BLOCK_FREQUENCY)):
             last_falling_block_time = pygame.time.get_ticks()
             if board.valid_position(current_block, 0, 1):
                 current_block.y += 1
