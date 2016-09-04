@@ -81,12 +81,6 @@ while True:
                 current_block.y += 1
                 last_falling_block_time = pygame.time.get_ticks()
 
-        if current_block.y < BOARD_HEIGHT - 1:
-            if moving_down:
-                if board.valid_position(current_block, 0, 1):
-                    current_block.y += 1
-                    last_falling_block_time = pygame.time.get_ticks()
-
         if current_block.x >= 0:
             if moving_left:
                 if board.valid_position(current_block, -1, 0):
@@ -97,11 +91,6 @@ while True:
                 if board.valid_position(current_block, 1, 0):
                     current_block.x += 1
 
-        if pygame.time.get_ticks() - last_falling_block_time > FALLING_BLOCK_FREQUENCY:
-            if board.valid_position(current_block, 0, 1):
-                current_block.y += 1
-                last_falling_block_time = pygame.time.get_ticks()
-
         if rotate:
             rotated_block = current_block.copy(BOARD_WIDTH/2, 1)
             rotated_block.rotate_block()
@@ -109,9 +98,14 @@ while True:
                 current_block = rotated_block
                 rotate = False
 
-        if board.check_block_collision(current_block):
-            if not board.valid_position(current_block, 0, 0):
-                game_over = True
+        if not board.valid_position(current_block, 0, 0):
+            game_over = True
+
+        if (is_fast_drop or moving_down or
+            (pygame.time.get_ticks() - last_falling_block_time > FALLING_BLOCK_FREQUENCY)):
+            last_falling_block_time = pygame.time.get_ticks()
+            if board.valid_position(current_block, 0, 1):
+                current_block.y += 1
             else:
                 board.draw_block_on_board(current_block)
                 is_fast_drop = False
