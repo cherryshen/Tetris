@@ -42,18 +42,6 @@ class Board:
                         return False
         return True
 
-    def check_block_collision(self, tetris_piece):
-        block_row = len(tetris_piece.shapeArr)
-        block_col = len(tetris_piece.shapeArr[0])
-        for j in xrange(block_row):
-            for i in xrange(block_col):
-                if not self.valid_position(tetris_piece, 0, 1):
-                    return True
-        return False
-
     def update_level(self):
         checkLevel = self.score / 10
         self.level = checkLevel + 1
-
-
-
