@@ -1,5 +1,6 @@
 from constants import *
 
+
 class Board:
     def __init__(self, board_width, board_height):
         self.board = [[0] * board_width for _ in xrange(board_height)]

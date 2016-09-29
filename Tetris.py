@@ -141,4 +141,4 @@ while True:
 
     pygame.display.update()
 
-    clock.tick(10)
+    clock.tick(9)
